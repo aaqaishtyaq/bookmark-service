@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package v1;
+
+option go_package = "github.com/aaqaishtyaq/bookmark-service/pkg/api/v1";
+
+message Bookmark {
+  int64 id = 1;
+  string url= 2;
+}
+
+message CreateBookmarkReq {
+  string api = 1;
+  Bookmark bookmark = 2;
+}
+
+message CreateBookmarkRes {
+  string api = 1;
+  Bookmark bookmark = 2;
+}
+
+// message UpdateBookmarkReq {
+//   string api = 1;
+//   Bookmark bookmark = 2;
+// }
+
+// message UpdateBookmarkRes {
+//   string api = 1;
+//   Bookmark bookmark = 2;
+// }
+
+// message ReadBookmarkReq {
+//   string api = 1;
+//   Bookmark bookmark = 2;
+// }
+
+// message ReadBookmarkRes {
+//   string api = 1;
+//   Bookmark bookmark = 2;
+// }
+
+// message DeleteBookmarkReq {
+//   string api = 1;
+//   Bookmark bookmark = 2;
+// }
+
+// message DeleteBookmarkRes {
+//   string api = 1;
+//   Bookmark bookmark = 2;
+// }
+
+message ListBookmarksReq {
+  string api = 1;
+}
+
+message ListBookmarksRes {
+  string api = 1;
+  repeated Bookmark bookmarks = 2;
+}
+
+service BookmarkService {
+  rpc CreateBookmark(CreateBookmarkReq) returns (CreateBookmarkRes);
+  // rpc ReadBookmark(ReadBookmarkReq) returns (ReadBookmarkRes);
+  // rpc UpdateBookmark(UpdateBookmarkReq) returns (UpdateBookmarkRes);
+  // rpc DeleteBookmark(DeleteBookmarkReq) returns (DeleteBookmarkRes);
+  rpc ListBookmarks(ListBookmarksReq) returns (ListBookmarksRes);
+}
