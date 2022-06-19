@@ -9,6 +9,7 @@ import (
 	"net"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	v1pb "github.com/aaqaishtyaq/bookmark-service/pkg/api/v1"
 	"github.com/aaqaishtyaq/bookmark-service/pkg/logger"
@@ -47,6 +48,8 @@ type Config struct {
 	LogLevel int
 	// LogTimeFormat is print time format for logger e.g. 2006-01-02T15:04:05Z07:00
 	LogTimeFormat string
+	//DBPath lets the application knows the relative path for the sqlite db
+	DBPath string
 }
 
 func runServer() error {
@@ -59,6 +62,7 @@ func runServer() error {
 	flag.IntVar(&cfg.LogLevel, "log-level", 0, "Global log level")
 	flag.StringVar(&cfg.LogTimeFormat, "log-time-format", "",
 		"Print time format for logger e.g. 2006-01-02T15:04:05Z07:00")
+	flag.StringVar(&cfg.DBPath, "db-path", "", "Path to search for sqlite db")
 	flag.Parse()
 
 	if len(cfg.GRPCPort) == 0 {
@@ -70,7 +74,8 @@ func runServer() error {
 		return fmt.Errorf("failed to initialize logger: %v", err)
 	}
 
-	db, err := sql.Open("sqlite3", dbName)
+	dbFile := filepath.Join(cfg.DBPath, dbName)
+	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		return err
 	}

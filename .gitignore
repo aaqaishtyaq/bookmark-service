@@ -1,2 +1,3 @@
-cmd/server/server
-cmd/server/bookmark.db
+bookmark.db
+bin/
+bookmark.db
