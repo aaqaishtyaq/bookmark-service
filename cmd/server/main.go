@@ -35,7 +35,10 @@ CREATE TABLE IF NOT EXISTS bookmarks (
 id INTEGER NOT NULL PRIMARY KEY,
 url TEXT NOT NULL,
 Timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-);`
+);
+CREATE INDEX IF NOT EXISTS idx_bookmarks_url
+ON bookmarks (url);
+`
 )
 
 // Config is configuration for Server
@@ -46,9 +49,7 @@ type Config struct {
 	// Log parameters section
 	// LogLevel is global log level: Debug(-1), Info(0), Warn(1), Error(2), DPanic(3), Panic(4), Fatal(5)
 	LogLevel int
-	// LogTimeFormat is print time format for logger e.g. 2006-01-02T15:04:05Z07:00
-	LogTimeFormat string
-	//DBPath lets the application knows the relative path for the sqlite db
+	// DBPath lets the application knows the relative path for the sqlite db
 	DBPath string
 }
 
@@ -58,11 +59,9 @@ func runServer() error {
 
 	// get configuration
 	var cfg Config
-	flag.StringVar(&cfg.GRPCPort, "grpc-port", "", "gRPC port to bind")
+	flag.StringVar(&cfg.GRPCPort, "grpc-port", "8080", "gRPC port to bind")
 	flag.IntVar(&cfg.LogLevel, "log-level", 0, "Global log level")
-	flag.StringVar(&cfg.LogTimeFormat, "log-time-format", "",
-		"Print time format for logger e.g. 2006-01-02T15:04:05Z07:00")
-	flag.StringVar(&cfg.DBPath, "db-path", "", "Path to search for sqlite db")
+	flag.StringVar(&cfg.DBPath, "db-path", ".", "Path to search for sqlite db")
 	flag.Parse()
 
 	if len(cfg.GRPCPort) == 0 {
@@ -70,18 +69,24 @@ func runServer() error {
 	}
 
 	// initialize logger
-	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
+	if err := logger.Init(cfg.LogLevel, ""); err != nil {
 		return fmt.Errorf("failed to initialize logger: %v", err)
 	}
 
-	dbFile := filepath.Join(cfg.DBPath, dbName)
+	dbLoc := os.Getenv("DATABASE_PATH")
+	if dbLoc == "" {
+		logger.Log.Sugar().Infow("env variable DATABASE_PATH not set, using flag value", "value", cfg.DBPath)
+		dbLoc = cfg.DBPath
+	}
+
+	dbFile := filepath.Join(dbLoc, dbName)
 	db, err := sql.Open("sqlite3", dbFile)
 	if err != nil {
 		return err
 	}
-
 	defer db.Close()
 
+	logger.Log.Sugar().Info("Started the service with db: ", dbFile)
 	if _, err := db.Exec(schema); err != nil {
 		return err
 	}
@@ -107,7 +112,7 @@ func runServer() error {
 		}
 	}()
 
-	logger.Log.Sugar().Info("Server succesfully started on port :50051")
+	logger.Log.Sugar().Info("Server succesfully started on port: ", cfg.GRPCPort)
 
 	// Create a channel to receive OS signals
 	c := make(chan os.Signal, 1)

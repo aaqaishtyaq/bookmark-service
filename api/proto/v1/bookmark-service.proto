@@ -29,25 +29,25 @@ message CreateBookmarkRes {
 //   Bookmark bookmark = 2;
 // }
 
-// message ReadBookmarkReq {
-//   string api = 1;
-//   Bookmark bookmark = 2;
-// }
+message ReadBookmarkReq {
+  string api = 1;
+  Bookmark bookmark = 2;
+}
 
-// message ReadBookmarkRes {
-//   string api = 1;
-//   Bookmark bookmark = 2;
-// }
+message ReadBookmarkRes {
+  string api = 1;
+  repeated Bookmark bookmarks = 2;
+}
 
-// message DeleteBookmarkReq {
-//   string api = 1;
-//   Bookmark bookmark = 2;
-// }
+message DeleteBookmarkReq {
+  string api = 1;
+  Bookmark bookmark = 2;
+}
 
-// message DeleteBookmarkRes {
-//   string api = 1;
-//   Bookmark bookmark = 2;
-// }
+message DeleteBookmarkRes {
+  string api = 1;
+  repeated Bookmark bookmarks = 2;
+}
 
 message ListBookmarksReq {
   string api = 1;
@@ -60,8 +60,8 @@ message ListBookmarksRes {
 
 service BookmarkService {
   rpc CreateBookmark(CreateBookmarkReq) returns (CreateBookmarkRes);
-  // rpc ReadBookmark(ReadBookmarkReq) returns (ReadBookmarkRes);
+  rpc ReadBookmark(ReadBookmarkReq) returns (ReadBookmarkRes);
   // rpc UpdateBookmark(UpdateBookmarkReq) returns (UpdateBookmarkRes);
-  // rpc DeleteBookmark(DeleteBookmarkReq) returns (DeleteBookmarkRes);
+  rpc DeleteBookmark(DeleteBookmarkReq) returns (DeleteBookmarkRes);
   rpc ListBookmarks(ListBookmarksReq) returns (ListBookmarksRes);
 }
