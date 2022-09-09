@@ -19,9 +19,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type BookmarkServiceClient interface {
 	CreateBookmark(ctx context.Context, in *CreateBookmarkReq, opts ...grpc.CallOption) (*CreateBookmarkRes, error)
-	// rpc ReadBookmark(ReadBookmarkReq) returns (ReadBookmarkRes);
+	ReadBookmark(ctx context.Context, in *ReadBookmarkReq, opts ...grpc.CallOption) (*ReadBookmarkRes, error)
 	// rpc UpdateBookmark(UpdateBookmarkReq) returns (UpdateBookmarkRes);
-	// rpc DeleteBookmark(DeleteBookmarkReq) returns (DeleteBookmarkRes);
+	DeleteBookmark(ctx context.Context, in *DeleteBookmarkReq, opts ...grpc.CallOption) (*DeleteBookmarkRes, error)
 	ListBookmarks(ctx context.Context, in *ListBookmarksReq, opts ...grpc.CallOption) (*ListBookmarksRes, error)
 }
 
@@ -42,6 +42,24 @@ func (c *bookmarkServiceClient) CreateBookmark(ctx context.Context, in *CreateBo
 	return out, nil
 }
 
+func (c *bookmarkServiceClient) ReadBookmark(ctx context.Context, in *ReadBookmarkReq, opts ...grpc.CallOption) (*ReadBookmarkRes, error) {
+	out := new(ReadBookmarkRes)
+	err := c.cc.Invoke(ctx, "/v1.BookmarkService/ReadBookmark", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *bookmarkServiceClient) DeleteBookmark(ctx context.Context, in *DeleteBookmarkReq, opts ...grpc.CallOption) (*DeleteBookmarkRes, error) {
+	out := new(DeleteBookmarkRes)
+	err := c.cc.Invoke(ctx, "/v1.BookmarkService/DeleteBookmark", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *bookmarkServiceClient) ListBookmarks(ctx context.Context, in *ListBookmarksReq, opts ...grpc.CallOption) (*ListBookmarksRes, error) {
 	out := new(ListBookmarksRes)
 	err := c.cc.Invoke(ctx, "/v1.BookmarkService/ListBookmarks", in, out, opts...)
@@ -56,9 +74,9 @@ func (c *bookmarkServiceClient) ListBookmarks(ctx context.Context, in *ListBookm
 // for forward compatibility
 type BookmarkServiceServer interface {
 	CreateBookmark(context.Context, *CreateBookmarkReq) (*CreateBookmarkRes, error)
-	// rpc ReadBookmark(ReadBookmarkReq) returns (ReadBookmarkRes);
+	ReadBookmark(context.Context, *ReadBookmarkReq) (*ReadBookmarkRes, error)
 	// rpc UpdateBookmark(UpdateBookmarkReq) returns (UpdateBookmarkRes);
-	// rpc DeleteBookmark(DeleteBookmarkReq) returns (DeleteBookmarkRes);
+	DeleteBookmark(context.Context, *DeleteBookmarkReq) (*DeleteBookmarkRes, error)
 	ListBookmarks(context.Context, *ListBookmarksReq) (*ListBookmarksRes, error)
 	mustEmbedUnimplementedBookmarkServiceServer()
 }
@@ -69,6 +87,12 @@ type UnimplementedBookmarkServiceServer struct {
 
 func (UnimplementedBookmarkServiceServer) CreateBookmark(context.Context, *CreateBookmarkReq) (*CreateBookmarkRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateBookmark not implemented")
+}
+func (UnimplementedBookmarkServiceServer) ReadBookmark(context.Context, *ReadBookmarkReq) (*ReadBookmarkRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ReadBookmark not implemented")
+}
+func (UnimplementedBookmarkServiceServer) DeleteBookmark(context.Context, *DeleteBookmarkReq) (*DeleteBookmarkRes, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteBookmark not implemented")
 }
 func (UnimplementedBookmarkServiceServer) ListBookmarks(context.Context, *ListBookmarksReq) (*ListBookmarksRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListBookmarks not implemented")
@@ -104,6 +128,42 @@ func _BookmarkService_CreateBookmark_Handler(srv interface{}, ctx context.Contex
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BookmarkService_ReadBookmark_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadBookmarkReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookmarkServiceServer).ReadBookmark(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.BookmarkService/ReadBookmark",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookmarkServiceServer).ReadBookmark(ctx, req.(*ReadBookmarkReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BookmarkService_DeleteBookmark_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteBookmarkReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BookmarkServiceServer).DeleteBookmark(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/v1.BookmarkService/DeleteBookmark",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BookmarkServiceServer).DeleteBookmark(ctx, req.(*DeleteBookmarkReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _BookmarkService_ListBookmarks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListBookmarksReq)
 	if err := dec(in); err != nil {
@@ -132,6 +192,14 @@ var BookmarkService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateBookmark",
 			Handler:    _BookmarkService_CreateBookmark_Handler,
+		},
+		{
+			MethodName: "ReadBookmark",
+			Handler:    _BookmarkService_ReadBookmark_Handler,
+		},
+		{
+			MethodName: "DeleteBookmark",
+			Handler:    _BookmarkService_DeleteBookmark_Handler,
 		},
 		{
 			MethodName: "ListBookmarks",
